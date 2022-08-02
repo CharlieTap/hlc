@@ -4,8 +4,8 @@ plugins {
     alias(libs.plugins.kotlinter)
 }
 
-group = "com.tap"
-version = "1.0-SNAPSHOT"
+group = "com.tap.hlc"
+version = "1.0.0"
 
 kotlin {
     targets {
