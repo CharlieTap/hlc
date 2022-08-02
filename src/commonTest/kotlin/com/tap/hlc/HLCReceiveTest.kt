@@ -64,6 +64,7 @@ class HLCReceiveTest {
         val result = HybridLogicalClock.receive(localClock, remoteClock, now)
 
         assertTrue(result.fold({ true }, { false }))
+        assertEquals(localNode, result.get()?.node)
         assertEquals(futureTimestamp, result.get()?.timestamp)
     }
 
@@ -77,6 +78,7 @@ class HLCReceiveTest {
         val result = HybridLogicalClock.receive(localClock, remoteClock, now)
 
         assertTrue(result.fold({ true }, { false }))
+        assertEquals(localNode, result.get()?.node)
         assertEquals(now, result.get()?.timestamp)
         assertEquals(localClock.counter + 1, result.get()?.counter)
     }
@@ -91,6 +93,7 @@ class HLCReceiveTest {
         val result = HybridLogicalClock.receive(localClock, remoteClock, now)
 
         assertTrue(result.fold({ true }, { false }))
+        assertEquals(localNode, result.get()?.node)
         assertEquals(futureTimestamp, result.get()?.timestamp)
         assertEquals(remoteClock.counter + 1, result.get()?.counter)
     }
@@ -103,6 +106,7 @@ class HLCReceiveTest {
         val result = HybridLogicalClock.receive(localClock, remoteClock, now)
 
         assertTrue(result.fold({ true }, { false }))
+        assertEquals(localNode, result.get()?.node)
         assertEquals(now, result.get()?.timestamp)
         assertEquals(max(localClock.counter, remoteClock.counter) + 1, result.get()?.counter)
     }
@@ -117,6 +121,7 @@ class HLCReceiveTest {
         val result = HybridLogicalClock.receive(localClock, remoteClock, now)
 
         assertTrue(result.fold({ true }, { false }))
+        assertEquals(localNode, result.get()?.node)
         assertEquals(now, result.get()?.timestamp)
         assertEquals(0, result.get()?.counter)
     }
