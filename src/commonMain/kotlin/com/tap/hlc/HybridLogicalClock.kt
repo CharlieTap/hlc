@@ -27,7 +27,7 @@ data class HybridLogicalClock(
     companion object {
 
         // Call this every time a new event is generated on the node, set the local clock and the events timestamp equal to the result
-        fun increment(
+        fun localTick(
             local: HybridLogicalClock,
             wallClockTime: Timestamp = Timestamp.now(Clock.System),
             maxClockDrift: Int = 1000 * 60
@@ -40,7 +40,7 @@ data class HybridLogicalClock(
         }
 
         // Call this on all events from external nodes to create a new local hlc which factors in the remote event
-        fun receive(
+        fun remoteTock(
             local: HybridLogicalClock,
             remote: HybridLogicalClock,
             wallClockTime: Timestamp = Timestamp.now(Clock.System),
@@ -88,6 +88,8 @@ data class HybridLogicalClock(
 
         fun decodeFromString(encoded: String): Result<HybridLogicalClock, HLCDecodeError> {
             val parts = encoded.split(":")
+
+            if (parts.size < 3) return Err(HLCDecodeError.TimestampDecodeFailure(encoded))
 
             val timestamp = parts.firstOrNull()?.let {
                 Timestamp(it.toLong())

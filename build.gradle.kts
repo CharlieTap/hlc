@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinter)
+    id("maven-publish")
 }
 
 group = "com.tap.hlc"
