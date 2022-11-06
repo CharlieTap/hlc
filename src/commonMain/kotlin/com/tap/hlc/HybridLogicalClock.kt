@@ -113,4 +113,9 @@ data class HybridLogicalClock(
             timestamp.epochMillis.compareTo(other.timestamp.epochMillis)
         }
     }
+
+    override fun toString(): String {
+        return encodeToString(this)
+    }
+
 }
