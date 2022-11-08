@@ -117,5 +117,4 @@ data class HybridLogicalClock(
     override fun toString(): String {
         return encodeToString(this)
     }
-
 }
