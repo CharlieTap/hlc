@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.tap.hlc"
-version = "1.0.1"
+version = "1.1.0"
 
 kotlin {
     targets {
@@ -15,6 +15,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                api(libs.okio.core)
                 api(libs.kotlinx.datetime)
                 api(libs.result)
                 api(libs.uuid)
@@ -24,6 +25,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(libs.okio.fakefilesystem)
             }
         }
     }

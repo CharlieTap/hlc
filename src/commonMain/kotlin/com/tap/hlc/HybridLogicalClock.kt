@@ -4,10 +4,13 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.flatMap
+import com.github.michaelbull.result.getOr
 import kotlinx.datetime.Clock
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
+import okio.FileSystem
+import okio.Path
 
 /**
  * Implementation of a HLC [1][2]
@@ -26,7 +29,11 @@ data class HybridLogicalClock(
 
     companion object {
 
-        // Call this every time a new event is generated on the node, set the local clock and the events timestamp equal to the result
+        private const val CLOCK_FILE = "clock.hlc"
+
+        /**
+         * This should be called every time a new event is generated locally, the result becomes the events timestamp and the new local time
+         */
         fun localTick(
             local: HybridLogicalClock,
             wallClockTime: Timestamp = Timestamp.now(Clock.System),
@@ -39,7 +46,9 @@ data class HybridLogicalClock(
             }
         }
 
-        // Call this on all events from external nodes to create a new local hlc which factors in the remote event
+        /**
+         * This should be called every time a new event is received from a remote node, the result becomes the new local time
+         */
         fun remoteTock(
             local: HybridLogicalClock,
             remote: HybridLogicalClock,
@@ -99,6 +108,41 @@ data class HybridLogicalClock(
             val node = parts.getOrNull(2)?.let { NodeID(it) } ?: return Err(HLCDecodeError.NodeDecodeFailure(encoded))
 
             return Ok(HybridLogicalClock(timestamp, node, counter))
+        }
+
+        /**
+         * Persists the clock to a disk file at the specified directory path
+         *
+         * This call is blocking
+         *
+         * Usage:
+         * val directory = "/Users/alice".toPath()
+         * HybridLogicalClock.store(hlc, path)
+         */
+        fun store(hlc: HybridLogicalClock, directory: Path, fileSystem: FileSystem = FileSystem.SYSTEM, fileName : String = CLOCK_FILE) {
+            fileSystem.createDirectories(directory)
+            val filepath = directory / fileName
+            fileSystem.write(filepath) {
+                writeUtf8(hlc.toString())
+            }
+        }
+
+        /**
+         * Attempts to load a clock from a disk file at the specified directory path
+         *
+         * This call is blocking and will return null if no file is found
+         *
+         * Usage:
+         * val directory = "/Users/alice".toPath()
+         * val nullableClock = HybridLogicalClock.load(path)
+         */
+        fun load(directory: Path, fileSystem: FileSystem = FileSystem.SYSTEM, fileName: String = CLOCK_FILE) : HybridLogicalClock? {
+            val filepath = directory / fileName
+            if(!fileSystem.exists(filepath)) {
+                return null
+            }
+            val encoded = fileSystem.read(filepath) { readUtf8() }
+            return decodeFromString(encoded).getOr(null)
         }
     }
 

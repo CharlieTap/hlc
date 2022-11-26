@@ -8,6 +8,7 @@ kotlinx-coroutines = "1.6.4"
 kotlinx-datetime = "0.4.0"
 kotlinx-serialization = "1.4.1"
 
+okio="3.1.0"
 result = "1.1.16"
 uuid = "0.5.0"
 
@@ -24,6 +25,8 @@ kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter"  }
 
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime"}
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization"}
+okio-core = { module = "com.squareup.okio:okio", version.ref = "okio"}
+okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio"}
 result = { module = "com.michael-bull.kotlin-result:kotlin-result", version.ref = "result" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid"}
 
