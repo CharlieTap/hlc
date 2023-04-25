@@ -1,17 +1,16 @@
 package com.tap.hlc
 
 import com.benasher44.uuid.uuid4
+import okio.Path.Companion.toPath
+import okio.fakefilesystem.FakeFileSystem
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import okio.Path.Companion.toPath
-import okio.fakefilesystem.FakeFileSystem
 
 class HLCPersistTest {
 
     @Test
     fun `can store the hlc into a file at a given path`() {
-
         val fileSystem = FakeFileSystem()
 
         val epochMillis = 943920000000L
@@ -35,7 +34,6 @@ class HLCPersistTest {
 
     @Test
     fun `can load a hlc from a given path`() {
-
         val fileSystem = FakeFileSystem()
         val path = "/Users/alice".toPath()
         fileSystem.createDirectories(path)
@@ -62,7 +60,6 @@ class HLCPersistTest {
 
     @Test
     fun `can store and load a hlc to and from a given path`() {
-
         val fileSystem = FakeFileSystem()
         val path = "/Users/alice".toPath()
         fileSystem.createDirectories(path)

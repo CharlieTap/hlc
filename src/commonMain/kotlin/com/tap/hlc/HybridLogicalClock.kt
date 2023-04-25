@@ -6,11 +6,11 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.getOr
 import kotlinx.datetime.Clock
+import okio.FileSystem
+import okio.Path
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
-import okio.FileSystem
-import okio.Path
 
 /**
  * Implementation of a HLC [1][2]
@@ -24,7 +24,7 @@ import okio.Path
 data class HybridLogicalClock(
     val timestamp: Timestamp = Timestamp.now(Clock.System),
     val node: NodeID = NodeID.mint(),
-    val counter: Int = 0
+    val counter: Int = 0,
 ) : Comparable<HybridLogicalClock> {
 
     companion object {
@@ -37,12 +37,14 @@ data class HybridLogicalClock(
         fun localTick(
             local: HybridLogicalClock,
             wallClockTime: Timestamp = Timestamp.now(Clock.System),
-            maxClockDrift: Int = 1000 * 60
+            maxClockDrift: Int = 1000 * 60,
         ): Result<HybridLogicalClock, HLCError> {
             return if (wallClockTime.epochMillis > local.timestamp.epochMillis) {
                 Ok(local.copy(timestamp = wallClockTime))
-            } else Ok(local.copy(counter = local.counter + 1)).flatMap { clock ->
-                validate(clock, wallClockTime, maxClockDrift)
+            } else {
+                Ok(local.copy(counter = local.counter + 1)).flatMap { clock ->
+                    validate(clock, wallClockTime, maxClockDrift)
+                }
             }
         }
 
@@ -53,7 +55,7 @@ data class HybridLogicalClock(
             local: HybridLogicalClock,
             remote: HybridLogicalClock,
             wallClockTime: Timestamp = Timestamp.now(Clock.System),
-            maxClockDrift: Int = 1000 * 60
+            maxClockDrift: Int = 1000 * 60,
         ): Result<HybridLogicalClock, HLCError> {
             return when {
                 local.node.identifier == remote.node.identifier -> {
@@ -119,7 +121,7 @@ data class HybridLogicalClock(
          * val directory = "/Users/alice".toPath()
          * HybridLogicalClock.store(hlc, path)
          */
-        fun store(hlc: HybridLogicalClock, directory: Path, fileSystem: FileSystem = FileSystem.SYSTEM, fileName : String = CLOCK_FILE) {
+        fun store(hlc: HybridLogicalClock, directory: Path, fileSystem: FileSystem = FileSystem.SYSTEM, fileName: String = CLOCK_FILE) {
             fileSystem.createDirectories(directory)
             val filepath = directory / fileName
             fileSystem.write(filepath) {
@@ -136,9 +138,9 @@ data class HybridLogicalClock(
          * val directory = "/Users/alice".toPath()
          * val nullableClock = HybridLogicalClock.load(path)
          */
-        fun load(directory: Path, fileSystem: FileSystem = FileSystem.SYSTEM, fileName: String = CLOCK_FILE) : HybridLogicalClock? {
+        fun load(directory: Path, fileSystem: FileSystem = FileSystem.SYSTEM, fileName: String = CLOCK_FILE): HybridLogicalClock? {
             val filepath = directory / fileName
-            if(!fileSystem.exists(filepath)) {
+            if (!fileSystem.exists(filepath)) {
                 return null
             }
             val encoded = fileSystem.read(filepath) { readUtf8() }
